@@ -115,3 +115,19 @@ bool IsEqual(BIG_DECIMAL *A, BIG_DECIMAL *B)
 
 	return true;
 }
+
+bool IsBigger(BIG_DECIMAL *A, BIG_DECIMAL *B)
+{
+	if(A->size > B->size)
+		return true;
+	if(A->size < B->size)
+		return false;
+	for(int i = 0; i < A->size; i++)
+	{
+		if(A->digit[i] > B->digit[i])
+			return true;
+		else if(A->digit[i] < B->digit[i])
+			return false;
+	}
+	return false;
+}

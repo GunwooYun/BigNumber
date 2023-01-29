@@ -21,13 +21,16 @@ int main()
 	BIG_DECIMAL a;
 	BIG_DECIMAL b;
 
-	a = CreateDecimal("1234567890", 10);
+	a = CreateDecimal("1234567892", 10);
 	b = CreateDecimal("1234567891", 10);
 
 	if(IsEqual(&a, &b))
 		printf("a and b equal\n");
 	else
 		printf("a and b not equal\n");
+
+	if(IsBigger(&a, &b)) printf("a is bigger\n");
+	else printf("a is equal or smaller\n");
 
 
 	freeDecimal(a);
