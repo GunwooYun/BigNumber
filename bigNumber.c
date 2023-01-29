@@ -62,3 +62,40 @@ void freeDecimal(BIG_DECIMAL decimal)
 		free(decimal.digit);
 	}
 }
+
+BIG_BINARY CreateBinary(unsigned char *bytes, unsigned int length)
+{
+	BIG_BINARY binary;
+
+	binary.byte = (unsigned char *)malloc(length);
+
+	for(int i = 0; i < length; i++)
+	{
+		binary.byte[i] = bytes[length-1-i];
+	}
+
+	binary.size = length;
+
+	return binary;
+}
+
+void PrintBinary(BIG_BINARY binary)
+{
+	unsigned char mask;
+	for(int i = binary.size - 1; i >= 0; i--)
+	{
+		mask = 0x80;
+		while(mask > 0)
+		{
+			if((binary.byte[i] - 48) & mask) printf("1");
+			else printf("0");
+			mask = mask >> 1;
+		}
+	}
+}
+
+void FreeBinary(BIG_BINARY binary)
+{
+	if(binary.byte != NULL)
+		free(binary.byte);
+}
