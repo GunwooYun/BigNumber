@@ -99,3 +99,19 @@ void FreeBinary(BIG_BINARY binary)
 	if(binary.byte != NULL)
 		free(binary.byte);
 }
+
+bool IsEqual(BIG_DECIMAL *A, BIG_DECIMAL *B)
+{
+	if(A->size != B->size)
+	{
+		return false;
+	}
+
+	for(int i= 0; i < A->size; i++)
+	{
+		if(A->digit[i] != B->digit[i])
+			return false;
+	}
+
+	return true;
+}
