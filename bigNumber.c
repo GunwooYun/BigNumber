@@ -63,6 +63,14 @@ void freeDecimal(BIG_DECIMAL decimal)
 	}
 }
 
+/**
+* @author Gunwoo Yun
+* @ref Big Number 연산(김세훈)
+* @bridef create object of binary
+* @param[in] byte string
+* @param[in] length of string
+* @return BIG_BINARY_st
+*/
 BIG_BINARY CreateBinary(unsigned char *bytes, unsigned int length)
 {
 	BIG_BINARY binary;
@@ -79,6 +87,13 @@ BIG_BINARY CreateBinary(unsigned char *bytes, unsigned int length)
 	return binary;
 }
 
+/**
+* @author Gunwoo Yun
+* @ref Big Number 연산(김세훈)
+* @bridef print binary string
+* @param[in] BIG_BINARY_st
+* @return void
+*/
 void PrintBinary(BIG_BINARY binary)
 {
 	unsigned char mask;
@@ -114,4 +129,42 @@ bool IsEqual(BIG_DECIMAL *A, BIG_DECIMAL *B)
 	}
 
 	return true;
+}
+
+bool AddDecimal(BIG_DECIMAL *A, BIG_DECIMAL *B)
+{
+	if(A == NULL || B == NULL)
+		return false;
+
+	unsigned int length, remain, sum, carry;
+
+	BIG_DECIMAL decimal;
+	memset(&decimal, 0, sizeof(BIG_DECIMAL));
+
+	if(A->size >= B->size)
+	{
+		length = A->size;
+		remain = B->size;
+	}
+	else
+	{
+		length = B->size;
+		remain = A->size;
+	}
+
+	for(int i = 0; i < length; i++)
+	{
+		if(remain > 0)
+		{
+			sum = ((A->digit[i] - 48) + (B->digit[i] - 48)) % 10;
+			carry = sum / 10;
+
+			decimal.digit[i] += sum;
+			if(carry == 1)
+				decimal.digit[i+1] = 1;
+
+
+		}
+		remain--;
+	}
 }
