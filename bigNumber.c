@@ -203,4 +203,19 @@ BIG_DECIMAL* AddDecimal(BIG_DECIMAL *A, BIG_DECIMAL *B)
 	if(carryFlag)
 		decimal->size = length + 1;
 	return decimal;
+
+bool IsBigger(BIG_DECIMAL *A, BIG_DECIMAL *B)
+{
+	if(A->size > B->size)
+		return true;
+	if(A->size < B->size)
+		return false;
+	for(int i = 0; i < A->size; i++)
+	{
+		if(A->digit[i] > B->digit[i])
+			return true;
+		else if(A->digit[i] < B->digit[i])
+			return false;
+	}
+	return false;
 }

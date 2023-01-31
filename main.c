@@ -33,6 +33,8 @@ int main()
 	c = AddDecimal(&a, &b);
 
 	printDecimal(c);
+	if(IsBigger(&a, &b)) printf("a is bigger\n");
+	else printf("a is equal or smaller\n");
 
 
 	freeDecimal(a);
