@@ -8,7 +8,7 @@ int main()
 	BIG_BINARY binary;
 	decimal = CreateDecimal("1234567890", 10);
 
-	printDecimal(decimal);
+	printDecimal(&decimal);
 
 	freeDecimal(decimal);
 
@@ -21,13 +21,18 @@ int main()
 	BIG_DECIMAL a;
 	BIG_DECIMAL b;
 
-	a = CreateDecimal("1234567890", 10);
-	b = CreateDecimal("1234567891", 10);
+	a = CreateDecimal("123456789123456789123456789", 9);
+	b = CreateDecimal("123456789123456789123456789", 9);
 
 	if(IsEqual(&a, &b))
 		printf("a and b equal\n");
 	else
 		printf("a and b not equal\n");
+
+	BIG_DECIMAL *c;
+	c = AddDecimal(&a, &b);
+
+	printDecimal(c);
 
 
 	freeDecimal(a);

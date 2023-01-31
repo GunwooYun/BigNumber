@@ -17,7 +17,7 @@ typedef struct BIG_BINARY
 }BIG_BINARY;
 
 extern BIG_DECIMAL CreateDecimal(unsigned char *str, unsigned int size);
-extern void printDecimal(BIG_DECIMAL decimal);
+extern void printDecimal(BIG_DECIMAL *decimal);
 extern void freeDecimal(BIG_DECIMAL decimal);
 
 extern BIG_BINARY CreateBinary(unsigned char *str, unsigned int size);
@@ -25,4 +25,5 @@ extern void PrintBinary(BIG_BINARY binary);
 extern void FreeBinary(BIG_BINARY binary);
 
 extern bool IsEqual(BIG_DECIMAL *A, BIG_DECIMAL *B);
+extern BIG_DECIMAL* AddDecimal(BIG_DECIMAL *A, BIG_DECIMAL *B);
 #endif

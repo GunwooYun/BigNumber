@@ -2,6 +2,8 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
+#include <assert.h>
 
 /**
 * @author Gunwoo Yun
@@ -40,17 +42,17 @@ BIG_DECIMAL CreateDecimal(unsigned char *str, unsigned int size)
 * @param[in] decimal BIG_DECIMAL structure
 * @return void
 */
-void printDecimal(BIG_DECIMAL decimal)
+void printDecimal(BIG_DECIMAL *decimal)
 {
 	int i;
 
-	if(decimal.sign)
+	if(decimal->sign)
 	{
 		printf("-");
 	}
-	for( i = decimal.size - 1; i >= 0; i--)
+	for( i = decimal->size - 1; i >= 0; i--)
 	{
-		printf("%c", decimal.digit[i] + 48);
+		printf("%c", decimal->digit[i] + 48);
 	}
 	printf("\n");
 }
@@ -131,40 +133,74 @@ bool IsEqual(BIG_DECIMAL *A, BIG_DECIMAL *B)
 	return true;
 }
 
-bool AddDecimal(BIG_DECIMAL *A, BIG_DECIMAL *B)
+BIG_DECIMAL* AddDecimal(BIG_DECIMAL *A, BIG_DECIMAL *B)
 {
 	if(A == NULL || B == NULL)
-		return false;
+		return NULL;
+
+	printDecimal(A);
+	printDecimal(B);
 
 	unsigned int length, remain, sum, carry;
+	BIG_DECIMAL *largeNum;
 
-	BIG_DECIMAL decimal;
-	memset(&decimal, 0, sizeof(BIG_DECIMAL));
+	BIG_DECIMAL *decimal = (BIG_DECIMAL *)malloc(sizeof(BIG_DECIMAL));
+	assert(decimal != NULL);
+
+	//memset(decimal, 0, sizeof(BIG_DECIMAL));
 
 	if(A->size >= B->size)
 	{
 		length = A->size;
 		remain = B->size;
+		largeNum = A;
 	}
 	else
 	{
 		length = B->size;
 		remain = A->size;
+		largeNum = B;
 	}
+
+	decimal->digit = (unsigned char *)malloc(length + 1);
+	decimal->size = length;
+	memset(decimal->digit, 0, length + 1);
+
+	bool carryFlag = false;
 
 	for(int i = 0; i < length; i++)
 	{
 		if(remain > 0)
 		{
-			sum = ((A->digit[i] - 48) + (B->digit[i] - 48)) % 10;
+			sum = ((A->digit[i]) + (B->digit[i]));
 			carry = sum / 10;
 
-			decimal.digit[i] += sum;
-			if(carry == 1)
-				decimal.digit[i+1] = 1;
-
-
+			decimal->digit[i] += sum % 10;
+			if(carry == 1){
+				decimal->digit[i+1] = 1;
+				carry = 0;
+			}
+			remain--;
 		}
-		remain--;
+		else
+		{
+			if(i < length)
+			{
+				sum = (decimal->digit[i])  + (largeNum->digit[i]);
+				carry = sum / 10;
+				decimal->digit[i] = sum % 10;
+				if(carry == 1){
+					if(i == (length-1)){
+						carryFlag = true;
+					}
+					decimal->digit[i + 1] = 1;
+					carry = 0;
+				}
+			}
+		}
+
 	}
+	if(carryFlag)
+		decimal->size = length + 1;
+	return decimal;
 }
