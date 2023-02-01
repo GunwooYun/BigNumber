@@ -133,6 +133,30 @@ bool IsEqual(BIG_DECIMAL *A, BIG_DECIMAL *B)
 	return true;
 }
 
+bool IsBigger(BIG_DECIMAL *A, BIG_DECIMAL *B)
+{
+	if(A->size > B->size)
+		return true;
+	if(A->size < B->size)
+		return false;
+	for(int i = 0; i < A->size; i++)
+	{
+		if(A->digit[i] > B->digit[i])
+			return true;
+		else if(A->digit[i] < B->digit[i])
+			return false;
+	}
+	return false;
+}
+
+/**
+* @author Gunwoo Yun
+* @ref Big Number 연산(김세훈)
+* @bridef print binary string
+* @param[in] pointer BIG_DECIMAL_st
+* @param[in] pointer BIG_DECIMAL_st
+* @return pointer of BIG_DECIMAL_st
+*/
 BIG_DECIMAL* AddDecimal(BIG_DECIMAL *A, BIG_DECIMAL *B)
 {
 	if(A == NULL || B == NULL)
@@ -202,20 +226,71 @@ BIG_DECIMAL* AddDecimal(BIG_DECIMAL *A, BIG_DECIMAL *B)
 	}
 	if(carryFlag)
 		decimal->size = length + 1;
+	decimal->sign = 0;
 	return decimal;
+}
 
-bool IsBigger(BIG_DECIMAL *A, BIG_DECIMAL *B)
+/**
+* @author Gunwoo Yun
+* @ref Big Number 연산(김세훈)
+* @bridef example of book & very simple
+* @param[in] pointer BIG_DECIMAL_st
+* @param[in] pointer BIG_DECIMAL_st
+* @return BIG_DECIMAL_st
+*/
+BIG_DECIMAL PLUS(BIG_DECIMAL *A, BIG_DECIMAL *B)
 {
-	if(A->size > B->size)
-		return true;
-	if(A->size < B->size)
-		return false;
-	for(int i = 0; i < A->size; i++)
+	BIG_DECIMAL result;
+
+	unsigned int min, max;
+
+	BIG_DECIMAL *biggerNum = A->size > B->size ? A : B;
+
+	min = A->size > B->size ? B->size : A->size;
+	max = A->size > B->size ? A->size : B->size;
+
+	unsigned int size = max + 1; // For carry space
+	result.digit = (unsigned char *)malloc(size);
+
+	unsigned int i = 0;
+	unsigned char temp = 0;
+
+	for(;i < min; i++) // keep i value
 	{
-		if(A->digit[i] > B->digit[i])
-			return true;
-		else if(A->digit[i] < B->digit[i])
-			return false;
+		result.digit[i] = A->digit[i] + B->digit[i] + temp;
+		if(result.digit[i] > 0x09)
+		{
+			temp = 1;
+		}
+		else
+		{
+			temp = 0;
+		}
+		result.digit[i] %= 0x0A;
 	}
-	return false;
+	for(;i < max; i++) // keep i value
+	{
+		result.digit[i] = biggerNum->digit[i] + temp;
+		if(result.digit[i] > 0x09)
+		{
+			temp = 1;
+		}
+		else
+		{
+			temp = 0;
+		}
+		result.digit[i] %= 0x0A;
+	}
+	if(temp)
+	{
+		result.digit[i] = temp;
+		result.size = size;
+	}
+	else
+	{
+		result.size = size - 1;
+	}
+	result.sign = 0;
+
+	return result;
 }

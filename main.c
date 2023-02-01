@@ -30,9 +30,12 @@ int main()
 		printf("a and b not equal\n");
 
 	BIG_DECIMAL *c;
+	BIG_DECIMAL d;
 	c = AddDecimal(&a, &b);
+	d = PLUS(&a, &b);
 
 	printDecimal(c);
+	printDecimal(&d);
 	if(IsBigger(&a, &b)) printf("a is bigger\n");
 	else printf("a is equal or smaller\n");
 

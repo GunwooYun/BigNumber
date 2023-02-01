@@ -27,4 +27,5 @@ extern void FreeBinary(BIG_BINARY binary);
 extern bool IsEqual(BIG_DECIMAL *A, BIG_DECIMAL *B);
 extern BIG_DECIMAL* AddDecimal(BIG_DECIMAL *A, BIG_DECIMAL *B);
 extern bool IsBigger(BIG_DECIMAL *A, BIG_DECIMAL *B);
+extern BIG_DECIMAL PLUS(BIG_DECIMAL *A, BIG_DECIMAL *B);
 #endif
