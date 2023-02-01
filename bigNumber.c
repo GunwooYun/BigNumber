@@ -294,3 +294,43 @@ BIG_DECIMAL PLUS(BIG_DECIMAL *A, BIG_DECIMAL *B)
 
 	return result;
 }
+
+void AddDigit(BIG_DECIMAL *A, unsigned char digit)
+{
+	unsigned char carry = 0;
+	unsigned int newSize = A->size;
+	BIG_DECIMAL tmp;
+
+	/* clone A */
+	tmp.digit = (unsigned char *)malloc(A->size+1);
+	memset(tmp.digit, 0, A->size+1);
+	memcpy(tmp.digit, A->digit, A->size);
+
+	tmp.digit[0] += digit;
+	if(tmp.digit[0] > 0x09) 
+	{
+		tmp.digit[0] %= 0x0A;
+		carry = 1;
+		for(int i = 1; i < A->size; i++)
+		{
+			if(carry)
+			{
+				tmp.digit[i] += carry;
+				if(tmp.digit[i] > 0x09) carry = 1;
+				else carry = 0;
+				tmp.digit[i] %= 0x0A;
+			}
+			else
+				break;
+		}
+		if(carry)
+		{
+			tmp.digit[A->size] += carry;
+			newSize++;
+			A->digit = (unsigned char*)realloc(A->digit, newSize);
+		}
+	}
+
+	memcpy(A->digit, tmp.digit, newSize);
+	A->size = newSize;
+}

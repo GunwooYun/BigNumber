@@ -21,8 +21,8 @@ int main()
 	BIG_DECIMAL a;
 	BIG_DECIMAL b;
 
-	a = CreateDecimal("123456789123456789123456789", 9);
-	b = CreateDecimal("123456789123456789123456789", 9);
+	a = CreateDecimal("123456789123456789123456789", 27);
+	b = CreateDecimal("123456789123456789123456789", 27);
 
 	if(IsEqual(&a, &b))
 		printf("a and b equal\n");
@@ -38,6 +38,9 @@ int main()
 	printDecimal(&d);
 	if(IsBigger(&a, &b)) printf("a is bigger\n");
 	else printf("a is equal or smaller\n");
+
+	AddDigit(&a, 1);
+	printDecimal(&a);
 
 
 	freeDecimal(a);
