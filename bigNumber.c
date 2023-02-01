@@ -295,6 +295,14 @@ BIG_DECIMAL PLUS(BIG_DECIMAL *A, BIG_DECIMAL *B)
 	return result;
 }
 
+/**
+* @author Gunwoo Yun
+* @ref Big Number 연산(김세훈)
+* @bridef decimal plus digit
+* @param[in] pointer BIG_DECIMAL_st
+* @param[in] char
+* @return void
+*/
 void AddDigit(BIG_DECIMAL *A, unsigned char digit)
 {
 	unsigned char carry = 0;
