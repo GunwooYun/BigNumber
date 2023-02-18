@@ -431,7 +431,7 @@ BIG_DECIMAL* MinusDecimal(BIG_DECIMAL *A, BIG_DECIMAL *B)
 		}
 	}
 
-	if(A == big)
+	if(B == big)
 	{
 		decimal->sign = true;
 	}
