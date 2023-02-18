@@ -3,6 +3,13 @@
 
 #include <stdbool.h>
 
+#define INT_SIZE sizeof(int)
+#define MASK(num) (num >> (INT_SIZE * 8 - 1))
+#define ABS(num) (num + MASK(num)) ^ MASK(num)
+
+#define true 1
+#define false 0
+
 typedef struct BIG_DECIMAL
 {
 	unsigned char *digit; // value
@@ -30,4 +37,6 @@ extern bool IsBigger(BIG_DECIMAL *A, BIG_DECIMAL *B);
 extern BIG_DECIMAL PLUS(BIG_DECIMAL *A, BIG_DECIMAL *B);
 
 extern void AddDigit(BIG_DECIMAL *A, unsigned char digit);
+
+extern BIG_DECIMAL* MinusDecimal(BIG_DECIMAL *A, BIG_DECIMAL *B);
 #endif

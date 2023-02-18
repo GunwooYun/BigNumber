@@ -1,4 +1,5 @@
 #include "bigNumber.h"
+//#include "core.h"
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -341,4 +342,102 @@ void AddDigit(BIG_DECIMAL *A, unsigned char digit)
 
 	memcpy(A->digit, tmp.digit, newSize);
 	A->size = newSize;
+}
+
+/**
+* @author Gunwoo Yun
+* @ref Big Number 연산(김세훈)
+* @brief Minus for decimal, A - B
+* @param[in] pointer BIG_DECIMAL_st
+* @param[in] pointer BIG_DECIMAL_st
+* @return void
+*/
+
+BIG_DECIMAL* MinusDecimal(BIG_DECIMAL *A, BIG_DECIMAL *B)
+{
+	BIG_DECIMAL *big = NULL;
+	BIG_DECIMAL *small = NULL;
+	unsigned char borrow = 0;
+	unsigned char tmp = 0;
+	int sum = 0;
+
+	int i = 0;
+	unsigned int size = 0;
+
+	BIG_DECIMAL *decimal = (BIG_DECIMAL *)malloc(sizeof(BIG_DECIMAL));
+	assert(decimal != NULL);
+
+	memset(decimal, 0x00, sizeof(BIG_DECIMAL));
+
+	/* Check bigger */
+	if(A->size > B->size)
+	{
+		big = A;
+		small = B;
+	}
+	else if(B->size > A->size)
+	{
+		big = B;
+		small = A;
+	}
+	else
+	{
+		while(i < A->size)
+		{
+			if(A->digit[i] > B->digit[i])
+			{
+				big = A;
+				small = B;
+				break;
+			}
+			else if(A->digit[i] < B->digit[i])
+			{
+				big = B;
+				small = A;
+				break;
+			}
+			i++;
+		}
+
+		if(i == A->size)
+		{
+			/* A and B same */
+			return decimal;	
+		}
+	}
+
+	decimal->digit = (unsigned char *)malloc(big->size);
+
+	for(i = 0; i < big->size; i++)
+	{
+		if(i < small->size)
+		{
+			sum = big->digit[i] - small->digit[i] - borrow;
+		}
+		else
+		{
+			sum = big->digit[i] - borrow;
+		}
+		borrow = 0;
+		if(sum < 0)
+		{
+			borrow = 1;
+			sum += 10;
+		}
+		decimal->digit[i] = (unsigned char)sum;
+		if(sum > 0)
+		{
+			decimal->size = i + 1;
+		}
+	}
+
+	if(A == big)
+	{
+		decimal->sign = true;
+	}
+	else
+	{
+		decimal->sign = false;
+	}
+	return decimal;
 }
