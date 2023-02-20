@@ -8,11 +8,11 @@ int main()
 	BIG_DECIMAL a;
 	BIG_DECIMAL b;
 
-	a = CreateDecimal("123456789", 9);
-	b = CreateDecimal("223456789", 9);
+	a = CreateDecimal("99999999", 8);
+	b = CreateDecimal("9999", 4);
 
 	BIG_DECIMAL *c;
-	c = MinusDecimal(&a, &b);
+	c = MultiDecimal(&a, &b);
 	printDecimal(c);
 
 	freeDecimal(a);

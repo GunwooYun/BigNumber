@@ -441,3 +441,81 @@ BIG_DECIMAL* MinusDecimal(BIG_DECIMAL *A, BIG_DECIMAL *B)
 	}
 	return decimal;
 }
+
+
+/**
+* @author Gunwoo Yun
+* @ref Big Number 연산(김세훈)
+* @brief Multiply for decimal, A x B
+* @param[in] pointer BIG_DECIMAL_st
+* @param[in] pointer BIG_DECIMAL_st
+* @return void
+*/
+
+BIG_DECIMAL* MultiDecimal(BIG_DECIMAL *A, BIG_DECIMAL *B)
+{
+	int carry = 0;
+	int sum = 0;
+	int i = 0, j = 0;
+	BIG_DECIMAL *big = NULL;
+	BIG_DECIMAL *small = NULL;
+
+	BIG_DECIMAL *decimal = (BIG_DECIMAL *)malloc(sizeof(BIG_DECIMAL));
+	assert(decimal != NULL);
+
+	memset(decimal, 0x00, sizeof(BIG_DECIMAL));
+
+	/* Check bigger */
+	if(A->size > B->size)
+	{
+		big = A;
+		small = B;
+	}
+	else if(B->size > A->size)
+	{
+		big = B;
+		small = A;
+	}
+	else
+	{
+		while(i < A->size)
+		{
+			if(A->digit[i] > B->digit[i])
+			{
+				big = A;
+				small = B;
+				break;
+			}
+			else if(A->digit[i] < B->digit[i])
+			{
+				big = B;
+				small = A;
+				break;
+			}
+			i++;
+		}
+
+		if(i == A->size)
+		{
+			/* A and B same */
+			return decimal;	
+		}
+	}
+	int quotient = 0;
+	int remainder = 0;
+
+	decimal->digit = (unsigned char *)malloc(big->size + small->size);
+
+	for(i = 0; i < small->size; i++)
+	{
+		for(j = 0; j < big->size)
+		{
+			sum = small->digit[i] * big->digit[i] + quotient;
+			quotient = sum / 0x0A;
+			remainder = sum % 0x0A;
+			decimal->digit[i] = remainder;
+		}
+	}
+
+	return decimal;
+}
