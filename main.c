@@ -9,7 +9,7 @@ int main()
 	BIG_DECIMAL b;
 
 	a = CreateDecimal("9999999999999999", 16);
-	b = CreateDecimal("99999999", 8);
+	b = CreateDecimal("0", 1);
 
 	BIG_DECIMAL *c;
 	c = MultiDecimal(&a, &b);

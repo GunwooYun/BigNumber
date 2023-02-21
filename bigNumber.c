@@ -47,6 +47,10 @@ void printDecimal(BIG_DECIMAL *decimal)
 {
 	int i;
 
+	if(decimal->size == 0)
+	{
+		printf("0");
+	}
 	if(decimal->sign)
 	{
 		printf("-");
@@ -451,9 +455,14 @@ BIG_DECIMAL* MinusDecimal(BIG_DECIMAL *A, BIG_DECIMAL *B)
 * @param[in] pointer BIG_DECIMAL_st
 * @return void
 */
-
 BIG_DECIMAL* MultiDecimal(BIG_DECIMAL *A, BIG_DECIMAL *B)
 {
+	if(A == NULL || B == NULL)
+	{
+		printf("Parameter NULL error\n");
+		return NULL;
+	}
+
 	int carry = 0;
 	int sum = 0;
 	int i = 0, j = 0, k = 0;
@@ -462,6 +471,11 @@ BIG_DECIMAL* MultiDecimal(BIG_DECIMAL *A, BIG_DECIMAL *B)
 
 	BIG_DECIMAL *decimal = (BIG_DECIMAL *)malloc(sizeof(BIG_DECIMAL));
 	assert(decimal != NULL);
+
+	if((A->size == 1 && A->digit[0] == 0) || (B->size == 1 && B->digit[0] == 0))
+	{
+		return decimal;
+	}
 
 	memset(decimal, 0x00, sizeof(BIG_DECIMAL));
 
@@ -493,12 +507,6 @@ BIG_DECIMAL* MultiDecimal(BIG_DECIMAL *A, BIG_DECIMAL *B)
 				break;
 			}
 			i++;
-		}
-
-		if(i == A->size)
-		{
-			/* A and B same */
-			return decimal;	
 		}
 	}
 	int quotient = 0;
