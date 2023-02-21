@@ -521,7 +521,7 @@ BIG_DECIMAL* MultiDecimal(BIG_DECIMAL *A, BIG_DECIMAL *B)
 
 	for(i = 0; i < small->size; i++)
 	{
-		index = i;
+		index = i; /* index for sum, 1, 10, 100, ...*/
 		for(j = 0; j < big->size; j++)
 		{
 			sum = small->digit[i] * big->digit[j] + quotient;
@@ -545,9 +545,10 @@ BIG_DECIMAL* MultiDecimal(BIG_DECIMAL *A, BIG_DECIMAL *B)
 			decimal->digit[k] = sum;
 		}
 		quotient = 0;
-		decimal->size = index;
+		decimal->size = index; /* Last index is size */
 		memset(temp, 0, big->size + small->size);
 	}
+	free(temp);
 
 	return decimal;
 }
