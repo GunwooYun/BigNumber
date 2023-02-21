@@ -8,8 +8,8 @@ int main()
 	BIG_DECIMAL a;
 	BIG_DECIMAL b;
 
-	a = CreateDecimal("99999999", 8);
-	b = CreateDecimal("9999", 4);
+	a = CreateDecimal("9999999999999999", 16);
+	b = CreateDecimal("99999999", 8);
 
 	BIG_DECIMAL *c;
 	c = MultiDecimal(&a, &b);

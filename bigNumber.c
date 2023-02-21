@@ -456,7 +456,7 @@ BIG_DECIMAL* MultiDecimal(BIG_DECIMAL *A, BIG_DECIMAL *B)
 {
 	int carry = 0;
 	int sum = 0;
-	int i = 0, j = 0;
+	int i = 0, j = 0, k = 0;
 	BIG_DECIMAL *big = NULL;
 	BIG_DECIMAL *small = NULL;
 
@@ -503,18 +503,42 @@ BIG_DECIMAL* MultiDecimal(BIG_DECIMAL *A, BIG_DECIMAL *B)
 	}
 	int quotient = 0;
 	int remainder = 0;
+	int index = 0;
+	unsigned char *temp = NULL;
 
 	decimal->digit = (unsigned char *)malloc(big->size + small->size);
+	temp = (unsigned char *)malloc(big->size + small->size);
+	memset(decimal->digit, 0, big->size + small->size);
+	memset(temp, 0, big->size + small->size);
 
 	for(i = 0; i < small->size; i++)
 	{
-		for(j = 0; j < big->size)
+		index = i;
+		for(j = 0; j < big->size; j++)
 		{
-			sum = small->digit[i] * big->digit[i] + quotient;
-			quotient = sum / 0x0A;
-			remainder = sum % 0x0A;
-			decimal->digit[i] = remainder;
+			sum = small->digit[i] * big->digit[j] + quotient;
+			quotient = sum / 0x0A; /* 올림수 */
+			remainder = sum % 0x0A; /* 나머지 */
+			temp[index++] = remainder;
 		}
+		if(quotient > 0)
+		{
+			temp[index++] = quotient;
+		}
+		for(k = i; k < index; k++)
+		{
+			sum = decimal->digit[k] + temp[k] + carry;
+			carry = 0;
+			if(sum > 0x09)
+			{
+				carry = 1;
+				sum -= 0x0A;
+			}
+			decimal->digit[k] = sum;
+		}
+		quotient = 0;
+		decimal->size = index;
+		memset(temp, 0, big->size + small->size);
 	}
 
 	return decimal;
