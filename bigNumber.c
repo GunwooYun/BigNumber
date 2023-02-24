@@ -552,3 +552,104 @@ BIG_DECIMAL* MultiDecimal(BIG_DECIMAL *A, BIG_DECIMAL *B)
 
 	return decimal;
 }
+
+BIG_DECIMAL* checkBigger(BIG_DECIMAL *A, BIG_DECIMAL *B)
+{
+	/* Check bigger */
+	if(A->size > B->size)
+	{
+		return A;
+	}
+	else if(B->size > A->size)
+	{
+		return B;
+	}
+	else
+	{
+		while(i < A->size)
+		{
+			if(A->digit[i] > B->digit[i])
+			{
+				return A;
+			}
+			else if(A->digit[i] < B->digit[i])
+			{
+				return B;
+			}
+			i++;
+		}
+	}
+	return NULL;
+}
+
+int minusForDivide(unsigned char *a, BIG_DECIMAL *B)
+{
+	unsigned int i = B->size;
+	while(i > 0)
+	{
+		if(a[i] > B->digit[i])
+		{
+			return A;
+		}
+		else if(A->digit[i] < B->digit[i])
+		{
+			return B;
+		}
+		i--;
+	}
+
+}
+
+/**
+* @author Gunwoo Yun
+* @ref Big Number 연산(김세훈)
+* @brief Divide for decimal, A / B
+* @param[in] pointer BIG_DECIMAL_st
+* @param[in] pointer BIG_DECIMAL_st
+* @return void
+*/
+BIG_DECIMAL* DivideDecimal(BIG_DECIMAL *A, BIG_DECIMAL *B)
+{
+	if(A == NULL || B == NULL)
+	{
+		printf("Parameter NULL error\n");
+		return NULL;
+	}
+
+	/* A / 0 error */
+	if((B->size == 1 && B->digit[0] == 0))
+	{
+		printf("divide 0 error\n");
+		return NULL;
+	}
+
+	BIG_DECIMAL *decimal = (BIG_DECIMAL *)malloc(sizeof(BIG_DECIMAL));
+	assert(decimal != NULL);
+
+	memset(decimal, 0x00, sizeof(BIG_DECIMAL));
+
+	if((A->size == 1 && A->digit[0] == 0) || B == checkBigger(A, B))
+	{
+		decimal->digit = malloc(1);
+		assert(decimal->digit != NULL);
+		decimal->digit[0] = 0;
+		decimal->size = 1;
+		return decimal;
+	}
+
+	if(checkBigger(A, B) == NULL)
+	{
+		decimal->digit = malloc(1);
+		assert(decimal->digit != NULL);
+		decimal->digit[0] = 1;
+		decimal->size = 1;
+		return decimal;
+	}
+
+	unsigned char *tmp = (unsigned char *)malloc(A->size);
+	assert(tmp != NULL);
+	memset(tmp, 0x00, A->size); 
+
+
+
+}
