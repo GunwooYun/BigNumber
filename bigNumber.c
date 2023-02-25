@@ -1,5 +1,4 @@
 #include "bigNumber.h"
-//#include "core.h"
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -582,21 +581,103 @@ BIG_DECIMAL* checkBigger(BIG_DECIMAL *A, BIG_DECIMAL *B)
 	return NULL;
 }
 
-int minusForDivide(unsigned char *a, BIG_DECIMAL *B)
+unsigned char *checkBiggerForArr(unsigned char *arrA, unsigned char *arrB, unsigned int arrLen)
 {
-	unsigned int i = B->size;
+	unsigned int i = arrLen;
+	/* Check a is bigger than B */
 	while(i > 0)
 	{
-		if(a[i] > B->digit[i])
+		
+		if(arrA[i] > arrB[i])
 		{
-			return A;
+			return arrA; /* arrA is BIGGER */
 		}
-		else if(A->digit[i] < B->digit[i])
+		else if(arrB[i] > arrA[i])
 		{
-			return B;
+			return arrB; /* arrB is BIGGER */
 		}
 		i--;
 	}
+	return NULL; /* SAME */
+}
+
+int minusForDivide(unsigned char *a, BIG_DECIMAL *B)
+{
+	unsigned int i = B->size;
+	unsigned int minus_repeat = 1;
+	unsigned int sum = 0;
+
+	unsigned char *chk = NULL;
+
+#if 0
+	/* Check a is bigger than B */
+	while(i > 0)
+	{
+		
+		if(a[i] > B->digit[i] )
+		{
+			break; /* a is BIGGER */
+		}
+		else if(a[i] == B->digit[i] )
+		{
+			continue; /* digit of index is SAME */
+		}
+		else
+		{
+			return 0; /* B is BIGGER */
+		}
+		i--;
+	}
+	/* a and B are SAME */
+	if(i == 0)
+	{
+		return 1;
+	}
+#endif
+	chk = checkBiggerForArr(a, B->digit, B->size);
+	if(chk == B->digit)
+	{
+		return 0; /* B is BIGGER */
+	}
+	else if(chk == NULL)
+	{
+		return 1; /* a and B are SAME */
+	}
+
+#if 0
+	if(B->digit == checkBiggerForArr(a, B->digit, B->size))
+	{
+		return 0; /* B is BIGGER */
+	}
+	else if(NULL == checkBiggerForArr(a, B->digit, B->size))
+	{
+		return 1; /* a and B are SAME */
+	}
+#endif
+
+	while(minus_repeat < 10)
+	{
+		for(i = 0; i < B->size; i++)
+		{
+			sum = a[i] - B->digit[i] - borrow;
+			borrow = 0;
+			if(sum < 0)
+			{
+				borrow = 1;
+				sum += 10;
+			}
+			a[i] = (unsigned char)sum;
+		}
+
+		chk = checkBiggerForArr(a, B->digit, B->size);
+		if(chk == B->digit)
+		{
+			break;
+		}
+		minus_repeat++;
+	}
+
+	return minus_repeat;
 
 }
 
@@ -606,7 +687,7 @@ int minusForDivide(unsigned char *a, BIG_DECIMAL *B)
 * @brief Divide for decimal, A / B
 * @param[in] pointer BIG_DECIMAL_st
 * @param[in] pointer BIG_DECIMAL_st
-* @return void
+* @return pointer BIG_DECIMAL_st
 */
 BIG_DECIMAL* DivideDecimal(BIG_DECIMAL *A, BIG_DECIMAL *B)
 {
@@ -616,10 +697,10 @@ BIG_DECIMAL* DivideDecimal(BIG_DECIMAL *A, BIG_DECIMAL *B)
 		return NULL;
 	}
 
-	/* A / 0 error */
+	/* A divided by 0, ERROR */
 	if((B->size == 1 && B->digit[0] == 0))
 	{
-		printf("divide 0 error\n");
+		printf("divided by 0 error\n");
 		return NULL;
 	}
 
@@ -628,6 +709,7 @@ BIG_DECIMAL* DivideDecimal(BIG_DECIMAL *A, BIG_DECIMAL *B)
 
 	memset(decimal, 0x00, sizeof(BIG_DECIMAL));
 
+	/* 0 divided by n OR number of B is bigger than A */
 	if((A->size == 1 && A->digit[0] == 0) || B == checkBigger(A, B))
 	{
 		decimal->digit = malloc(1);
@@ -637,6 +719,7 @@ BIG_DECIMAL* DivideDecimal(BIG_DECIMAL *A, BIG_DECIMAL *B)
 		return decimal;
 	}
 
+	/* A and B are totally same number */
 	if(checkBigger(A, B) == NULL)
 	{
 		decimal->digit = malloc(1);
@@ -649,7 +732,4 @@ BIG_DECIMAL* DivideDecimal(BIG_DECIMAL *A, BIG_DECIMAL *B)
 	unsigned char *tmp = (unsigned char *)malloc(A->size);
 	assert(tmp != NULL);
 	memset(tmp, 0x00, A->size); 
-
-
-
 }
