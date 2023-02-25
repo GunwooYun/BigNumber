@@ -41,4 +41,6 @@ extern void AddDigit(BIG_DECIMAL *A, unsigned char digit);
 extern BIG_DECIMAL* MinusDecimal(BIG_DECIMAL *A, BIG_DECIMAL *B);
 
 extern BIG_DECIMAL* MultiDecimal(BIG_DECIMAL *A, BIG_DECIMAL *B);
+
+extern BIG_DECIMAL* DivideDecimal(BIG_DECIMAL *A, BIG_DECIMAL *B);
 #endif

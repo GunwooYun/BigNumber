@@ -554,6 +554,7 @@ BIG_DECIMAL* MultiDecimal(BIG_DECIMAL *A, BIG_DECIMAL *B)
 
 BIG_DECIMAL* checkBigger(BIG_DECIMAL *A, BIG_DECIMAL *B)
 {
+	unsigned int i = 0;
 	/* Check bigger */
 	if(A->size > B->size)
 	{
@@ -601,11 +602,12 @@ unsigned char *checkBiggerForArr(unsigned char *arrA, unsigned char *arrB, unsig
 	return NULL; /* SAME */
 }
 
-int minusForDivide(unsigned char *a, BIG_DECIMAL *B)
+int minusForDivide(unsigned char *a, BIG_DECIMAL *B, unsigned int aLen)
 {
 	unsigned int i = B->size;
 	unsigned int minus_repeat = 1;
 	unsigned int sum = 0;
+	unsigned int borrow = 0;
 
 	unsigned char *chk = NULL;
 
@@ -657,9 +659,16 @@ int minusForDivide(unsigned char *a, BIG_DECIMAL *B)
 
 	while(minus_repeat < 10)
 	{
-		for(i = 0; i < B->size; i++)
+		for(i = 0; i < aLen; i++)
 		{
-			sum = a[i] - B->digit[i] - borrow;
+			if(i < B->size)
+			{
+				sum = a[i] - B->digit[i] - borrow;
+			}
+			else
+			{
+				sum = a[i] - borrow;
+			}
 			borrow = 0;
 			if(sum < 0)
 			{
@@ -691,6 +700,8 @@ int minusForDivide(unsigned char *a, BIG_DECIMAL *B)
 */
 BIG_DECIMAL* DivideDecimal(BIG_DECIMAL *A, BIG_DECIMAL *B)
 {
+	unsigned int index_pointer = 0;
+	unsigned int quotient = 0;
 	if(A == NULL || B == NULL)
 	{
 		printf("Parameter NULL error\n");
@@ -728,8 +739,22 @@ BIG_DECIMAL* DivideDecimal(BIG_DECIMAL *A, BIG_DECIMAL *B)
 		decimal->size = 1;
 		return decimal;
 	}
+	decimal->digit = (unsigned char *)malloc(A->size);
+	assert(decimal->digit != NULL);
+	memset(decimal->digit, 0x00, A->size);
 
-	unsigned char *tmp = (unsigned char *)malloc(A->size);
-	assert(tmp != NULL);
-	memset(tmp, 0x00, A->size); 
+
+	for(int i = A->size - B->size; i >= 0; i--)
+	{
+		quotient = minusForDivide(&A->digit[i], B, A->size - i);
+		decimal->digit[i] = quotient;
+		if(decimal->size == 0)
+		{
+			decimal->size = i;
+		}
+	}
+
+	return decimal;
+
+
 }
