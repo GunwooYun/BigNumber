@@ -753,3 +753,76 @@ BIG_DECIMAL* DivideDecimal(BIG_DECIMAL *A, BIG_DECIMAL *B)
 
 	return decimal;
 }
+
+
+/**
+* @author Gunwoo Yun
+* @ref Big Number 연산(김세훈)
+* @brief Modulo for decimal, A / B
+* @param[in] pointer BIG_DECIMAL_st
+* @param[in] pointer BIG_DECIMAL_st
+* @return pointer BIG_DECIMAL_st
+*/
+BIG_DECIMAL* ModuloDecimal(BIG_DECIMAL *A, BIG_DECIMAL *B)
+{
+	unsigned int index_pointer = 0;
+	unsigned int quotient = 0;
+	if(A == NULL || B == NULL)
+	{
+		printf("Parameter NULL error\n");
+		return NULL;
+	}
+
+	/* A divided by 0, ERROR */
+	if((B->size == 1 && B->digit[0] == 0))
+	{
+		printf("divided by 0 error\n");
+		return NULL;
+	}
+
+	BIG_DECIMAL *decimal = (BIG_DECIMAL *)malloc(sizeof(BIG_DECIMAL));
+	assert(decimal != NULL);
+
+	memset(decimal, 0x00, sizeof(BIG_DECIMAL));
+
+	/* 0 divided by n OR number of B is bigger than A */
+	if((A->size == 1 && A->digit[0] == 0) || B == checkBigger(A, B))
+	{
+		decimal->digit = malloc(1);
+		assert(decimal->digit != NULL);
+		decimal->digit[0] = 0;
+		decimal->size = 1;
+		return decimal;
+	}
+
+	/* A and B are totally same number */
+	if(checkBigger(A, B) == NULL)
+	{
+		decimal->digit = malloc(1);
+		assert(decimal->digit != NULL);
+		decimal->digit[0] = 1;
+		decimal->size = 1;
+		return decimal;
+	}
+	decimal->digit = (unsigned char *)malloc(A->size);
+	assert(decimal->digit != NULL);
+	memset(decimal->digit, 0x00, A->size);
+
+
+	for(int i = A->size - B->size; i >= 0; i--)
+	{
+		quotient = minusForDivide(&A->digit[i], B, A->size - i);
+		//decimal->digit[i] = quotient;
+	}
+
+	for(int i = A->size - 1; i >= 0; i--)
+	{
+		if(A->digit[i] > 0 && decimal->size == 0)
+		{
+			decimal->size = i + 1;
+		}
+		decimal->digit[i] = A->digit[i];
+	}
+
+	return decimal;
+}

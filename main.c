@@ -8,12 +8,14 @@ int main()
 	BIG_DECIMAL a;
 	BIG_DECIMAL b;
 
-	a = CreateDecimal("1000000000", 10);
-	b = CreateDecimal("9999", 4);
+	a = CreateDecimal("99887721", 8);
+	b = CreateDecimal("99", 2);
 
 	BIG_DECIMAL *c;
-	c = DivideDecimal(&a, &b);
+	c = ModuloDecimal(&a, &b);
 	printDecimal(c);
+
+	//printDecimal(&a);
 
 	freeDecimal(a);
 	freeDecimal(b);
