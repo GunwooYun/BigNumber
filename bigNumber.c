@@ -582,12 +582,42 @@ BIG_DECIMAL* checkBigger(BIG_DECIMAL *A, BIG_DECIMAL *B)
 	return NULL;
 }
 
-unsigned char *checkBiggerForArr(unsigned char *arrA, unsigned char *arrB, unsigned int arrLen)
+unsigned char *checkBiggerForArr(unsigned char *arrA, unsigned char *arrB, unsigned int arrA_len, unsigned int arrB_len)
 {
-	unsigned int i = arrLen;
-	/* Check a is bigger than B */
-	while(i > 0)
+	int i = arrA_len - 1;
+
+	for(i; i > arrB_len - 1; i--)
 	{
+		if(arrA[i] != 0)
+		{
+			return arrA;
+		}
+	}
+
+	for(i; i >= 0; i--)
+	{
+		if(arrA[i] > arrB[i])
+		{
+			return arrA; /* arrA is BIGGER */
+		}
+		else if(arrB[i] > arrA[i])
+		{
+			return arrB; /* arrB is BIGGER */
+		}
+	}
+
+#if 0
+	/* Check a is bigger than B */
+	while(i >= 0)
+	{
+		if(i > arrB_len && arrA[i] != 0)
+		{
+			return arrA;
+		}
+		else
+		{
+			continue;
+		}
 		
 		if(arrA[i] > arrB[i])
 		{
@@ -599,6 +629,7 @@ unsigned char *checkBiggerForArr(unsigned char *arrA, unsigned char *arrB, unsig
 		}
 		i--;
 	}
+#endif
 	return NULL; /* SAME */
 }
 
@@ -606,52 +637,18 @@ int minusForDivide(unsigned char *a, BIG_DECIMAL *B, unsigned int aLen)
 {
 	unsigned int i = B->size;
 	unsigned int minus_repeat = 1;
-	unsigned int sum = 0;
+	int sum = 0;
 	unsigned int borrow = 0;
 
 	unsigned char *chk = NULL;
 
-#if 0
-	/* Check a is bigger than B */
-	while(i > 0)
-	{
-		
-		if(a[i] > B->digit[i] )
-		{
-			break; /* a is BIGGER */
-		}
-		else if(a[i] == B->digit[i] )
-		{
-			continue; /* digit of index is SAME */
-		}
-		else
-		{
-			return 0; /* B is BIGGER */
-		}
-		i--;
-	}
-	/* a and B are SAME */
-	if(i == 0)
-	{
-		return 1;
-	}
-#endif
-	chk = checkBiggerForArr(a, B->digit, B->size);
+	chk = checkBiggerForArr(a, B->digit, aLen, B->size);
 	if(chk == B->digit)
 	{
 		return 0; /* B is BIGGER */
 	}
-	else if(chk == NULL)
-	{
-		return 1; /* a and B are SAME */
-	}
-
 #if 0
-	if(B->digit == checkBiggerForArr(a, B->digit, B->size))
-	{
-		return 0; /* B is BIGGER */
-	}
-	else if(NULL == checkBiggerForArr(a, B->digit, B->size))
+	else if(chk == NULL)
 	{
 		return 1; /* a and B are SAME */
 	}
@@ -678,7 +675,7 @@ int minusForDivide(unsigned char *a, BIG_DECIMAL *B, unsigned int aLen)
 			a[i] = (unsigned char)sum;
 		}
 
-		chk = checkBiggerForArr(a, B->digit, B->size);
+		chk = checkBiggerForArr(a, B->digit, aLen, B->size);
 		if(chk == B->digit)
 		{
 			break;
@@ -748,13 +745,11 @@ BIG_DECIMAL* DivideDecimal(BIG_DECIMAL *A, BIG_DECIMAL *B)
 	{
 		quotient = minusForDivide(&A->digit[i], B, A->size - i);
 		decimal->digit[i] = quotient;
-		if(decimal->size == 0)
+		if(decimal->size == 0 && quotient != 0)
 		{
-			decimal->size = i;
+			decimal->size = i+1;
 		}
 	}
 
 	return decimal;
-
-
 }

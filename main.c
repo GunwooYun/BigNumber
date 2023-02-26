@@ -8,8 +8,8 @@ int main()
 	BIG_DECIMAL a;
 	BIG_DECIMAL b;
 
-	a = CreateDecimal("9999", 4);
-	b = CreateDecimal("99", 2);
+	a = CreateDecimal("1000000000", 10);
+	b = CreateDecimal("9999", 4);
 
 	BIG_DECIMAL *c;
 	c = DivideDecimal(&a, &b);
