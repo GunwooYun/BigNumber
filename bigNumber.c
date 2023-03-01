@@ -882,5 +882,50 @@ bool IsPrimeNumber(BIG_DECIMAL *num)
    free(result->digit);
    free(denominator.digit);
    free(max->digit);
+
    return true;
 }
+
+BIG_DECIMAL* GetDecimalFromBinary(BIG_BINARY *binary)
+{
+   if(binary == NULL)
+   {
+      printf("null error\n");
+      return NULL;
+   }
+   
+   BIG_DECIMAL result = CreateDecimal('0', 1);
+   BIG_DECIMAL product;
+   BIG_DECIMAL two = CreateDecimal('2', 1);
+   BIG_DECIMAL *temp = NULL;
+
+   CreateDecimal(unsigned char *str, unsigned int size)
+   BIG_DECIMAL *decimal = (BIG_DECIMAL *)malloc(sizeof(BIG_DEICMAL));
+   assert(decimal != NULL);
+   memset(decimal, 0x00, sizeof(BIG_DECIMAL));
+
+   /*
+   BIG_DECIMAL *temp = (BIG_DECIMAL *)malloc(sizeof(BIG_DEICMAL));
+   assert(multi != NULL);
+   memset(multi, 0x00, sizeof(BIG_DECIMAL));
+   */
+
+   unsigned char mask;
+
+   for(int i = 0; i < binary->size; i++)
+   {
+      mask = 0x01;
+      for(int j = 0; j < 8; i++)
+      {
+         if(binary->byte[i] & mask)
+         {
+            result = PLUS(&result, &product);
+         }
+         mask = mask << 1;
+      }
+      temp = MultiDecimal(&product, &two);
+   }
+}
+
+
+BIG_DECIMAL* MultiDecimal(BIG_DECIMAL *A, BIG_DECIMAL *B)
