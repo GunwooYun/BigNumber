@@ -926,6 +926,3 @@ BIG_DECIMAL* GetDecimalFromBinary(BIG_BINARY *binary)
       temp = MultiDecimal(&product, &two);
    }
 }
-
-
-BIG_DECIMAL* MultiDecimal(BIG_DECIMAL *A, BIG_DECIMAL *B)
