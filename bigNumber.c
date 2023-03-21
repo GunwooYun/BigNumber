@@ -454,13 +454,8 @@ BIG_DECIMAL* MinusDecimal(BIG_DECIMAL *A, BIG_DECIMAL *B)
 * @param[in] pointer BIG_DECIMAL_st
 * @return void
 */
-BIG_DECIMAL* MultiDecimal(BIG_DECIMAL *A, BIG_DECIMAL *B)
+BIG_DECIMAL MultiDecimal(BIG_DECIMAL *A, BIG_DECIMAL *B)
 {
-   if(A == NULL || B == NULL)
-   {
-      printf("Parameter NULL error\n");
-      return NULL;
-   }
 
    int carry = 0;
    int sum = 0;
@@ -468,15 +463,17 @@ BIG_DECIMAL* MultiDecimal(BIG_DECIMAL *A, BIG_DECIMAL *B)
    BIG_DECIMAL *big = NULL;
    BIG_DECIMAL *small = NULL;
 
-   BIG_DECIMAL *decimal = (BIG_DECIMAL *)malloc(sizeof(BIG_DECIMAL));
-   assert(decimal != NULL);
+   //BIG_DECIMAL *decimal = (BIG_DECIMAL *)malloc(sizeof(BIG_DECIMAL));
+   //assert(decimal != NULL);
+   BIG_DECIMAL decimal;
 
    if((A->size == 1 && A->digit[0] == 0) || (B->size == 1 && B->digit[0] == 0))
    {
+      decimal = CreateDecimal("0", 1);
       return decimal;
    }
 
-   memset(decimal, 0x00, sizeof(BIG_DECIMAL));
+   //memset(&decimal, 0x00, sizeof(BIG_DECIMAL));
 
    /* Check bigger */
    if(A->size > B->size)
@@ -505,17 +502,27 @@ BIG_DECIMAL* MultiDecimal(BIG_DECIMAL *A, BIG_DECIMAL *B)
             small = A;
             break;
          }
+         else
+         {
+            big = A;
+            small = B;
+            break;
+         }
          i++;
       }
    }
+
    int quotient = 0;
    int remainder = 0;
    int index = 0;
    unsigned char *temp = NULL;
 
-   decimal->digit = (unsigned char *)malloc(big->size + small->size);
-   temp = (unsigned char *)malloc(big->size + small->size);
-   memset(decimal->digit, 0, big->size + small->size);
+
+   /* 곱셈 결과의 최대 자리수는 두 수의 자리수의 합 */
+   decimal.digit = (unsigned char *)malloc(big->size + small->size);
+   temp = (unsigned char *)malloc(big->size + small->size); /* 결과 임시 저장 */
+
+   memset(decimal.digit, 0, big->size + small->size);
    memset(temp, 0, big->size + small->size);
 
    for(i = 0; i < small->size; i++)
@@ -532,20 +539,33 @@ BIG_DECIMAL* MultiDecimal(BIG_DECIMAL *A, BIG_DECIMAL *B)
       {
          temp[index++] = quotient;
       }
+
+      /* 곱셈 결과값을 더함 */
       for(k = i; k < index; k++)
       {
-         sum = decimal->digit[k] + temp[k] + carry;
-         carry = 0;
+         /* 임시 결과값 덧셈 */
+         sum = decimal.digit[k] + temp[k] + carry;
+         carry = 0; /* 자리 올림수 */
          if(sum > 0x09)
          {
             carry = 1;
-            sum -= 0x0A;
+            sum -= 0x0A; /* 10단위 빼고 나머지 */
          }
-         decimal->digit[k] = sum;
+         decimal.digit[k] = sum;
       }
       quotient = 0;
-      decimal->size = index; /* Last index is size */
+      decimal.size = index; /* Last index is size */
       memset(temp, 0, big->size + small->size);
+   }
+
+   /* Check sign */
+   if(A->sign == 1 || B->sign == 1)
+   {
+      decimal.sign = 1;
+   }
+   else
+   {
+      decimal.sign = 0;
    }
    free(temp);
 
@@ -894,35 +914,4 @@ BIG_DECIMAL* GetDecimalFromBinary(BIG_BINARY *binary)
       return NULL;
    }
    
-   BIG_DECIMAL result = CreateDecimal('0', 1);
-   BIG_DECIMAL product;
-   BIG_DECIMAL two = CreateDecimal('2', 1);
-   BIG_DECIMAL *temp = NULL;
-
-   CreateDecimal(unsigned char *str, unsigned int size)
-   BIG_DECIMAL *decimal = (BIG_DECIMAL *)malloc(sizeof(BIG_DEICMAL));
-   assert(decimal != NULL);
-   memset(decimal, 0x00, sizeof(BIG_DECIMAL));
-
-   /*
-   BIG_DECIMAL *temp = (BIG_DECIMAL *)malloc(sizeof(BIG_DEICMAL));
-   assert(multi != NULL);
-   memset(multi, 0x00, sizeof(BIG_DECIMAL));
-   */
-
-   unsigned char mask;
-
-   for(int i = 0; i < binary->size; i++)
-   {
-      mask = 0x01;
-      for(int j = 0; j < 8; i++)
-      {
-         if(binary->byte[i] & mask)
-         {
-            result = PLUS(&result, &product);
-         }
-         mask = mask << 1;
-      }
-      temp = MultiDecimal(&product, &two);
-   }
 }

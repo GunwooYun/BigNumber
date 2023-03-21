@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <assert.h>
+//#include <stdlib.h>
 #include "bigNumber.h"
 
 int main()
@@ -7,29 +8,24 @@ int main()
 
    BIG_DECIMAL a;
    BIG_DECIMAL b;
+   BIG_DECIMAL c;
+   //a.digit = malloc(10);
 
-   a = CreateDecimal("1579", 4);
+   a = CreateDecimal("2", 1);
    printDecimal(&a);
-   if(IsPrimeNumber(&a))
-   {
-      printf(" is prime number\n");
-   }
-   else
-   {
-      printf(" is not prime number\n");
-   }
-   //b = CreateDecimal("99", 2);
+   b = CreateDecimal("2", 1);
+   printDecimal(&b);
+   
+   c = MultiDecimal(&a, &b);
+   
+   printDecimal(&c);
 
-   //BIG_DECIMAL *c;
-   //c = ModuloDecimal(&a, &b);
-   //printDecimal(c);
 
-   //printDecimal(&a);
+
+   
 
    freeDecimal(a);
-   //freeDecimal(b);
-   //freeDecimal(*c);
-
-
+   freeDecimal(b);
+   freeDecimal(c);
    return (0);
 }
