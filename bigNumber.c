@@ -113,6 +113,7 @@ void PrintBinary(BIG_BINARY binary)
          mask = mask >> 1;
       }
    }
+   printf("\n");
 }
 
 void FreeBinary(BIG_BINARY binary)
@@ -906,12 +907,36 @@ bool IsPrimeNumber(BIG_DECIMAL *num)
    return true;
 }
 
-BIG_DECIMAL* GetDecimalFromBinary(BIG_BINARY *binary)
+BIG_DECIMAL GetDecimalFromBinary(BIG_BINARY *binary)
 {
-   if(binary == NULL)
+
+   BIG_DECIMAL decimal = CreateDecimal((unsigned char *)"0", 1);
+   BIG_DECIMAL temp = CreateDecimal((unsigned char *)"1", 1);
+   BIG_DECIMAL two = CreateDecimal((unsigned char *)"2", 1);
+
+   unsigned char *ptrDigit = NULL;
+
+   unsigned char mask;
+
+   for(int i = 0; i < binary->size; i++)
    {
-      printf("null error\n");
-      return NULL;
+      mask = 0x01;
+      for(int j = 0; j < 8; j++)
+      {
+         /* bit number is 1 */
+         if(binary->byte[i] & mask)
+         {
+            ptrDigit = decimal.digit; /* Prevent from malloc again */
+            decimal = PLUS(&decimal, &temp);
+            free(ptrDigit);
+         }
+         mask = mask << 1; /* mask left shift */
+
+         ptrDigit = temp.digit;
+         temp = MultiDecimal(&temp, &two);
+         free(ptrDigit);
+      }
    }
-   
+
+   return decimal;
 }
