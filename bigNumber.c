@@ -940,3 +940,101 @@ BIG_DECIMAL GetDecimalFromBinary(BIG_BINARY *binary)
 
    return decimal;
 }
+
+
+BIG_BINARY GetBinary(BIG_DECIMAL *decimal)
+{
+   int i, j, position;
+   BIG_BINARY binary;
+   BIG_DECIMAL  denominator, zero;
+   BIG_DECIMAL *remainder, numerator;
+   BIG_DECIMAL *pDec = NULL;
+
+   binary.byte = (unsigned char *)malloc((int)(decimal->size / 2) + 1); /* binary size */
+
+   /* 나눠질 10진수 숫자 */
+   numerator.digit = (unsigned char *)malloc(decimal->size);
+   numerator.size = decimal->size;
+   for (i = 0; i < numerator.size; i++)
+   {
+      numerator.digit[i] = decimal->digit[i];
+   }
+
+   denominator = CreateDecimal((unsigned char *)"256", 3); /* 나눌 숫자 256 */
+
+   for (position = 0;; position++)
+   {
+      remainder = ModuloDecimal(&numerator, &denominator);
+
+      void *ptrDigit = (void *)numerator.digit;
+      numerator = DivideDcimal(&numerator, &denominator);
+      free(ptrDigit);
+
+      binary.byte[position] = 0x00;
+
+      /* 10진수를 256으로 나눈 나머지를 byte 변수에 저장 */
+      for (i = 0; i < remainder.size; i++)
+      {
+         unsigned char tempMultiply = 1;
+
+         for(j = 0; j < i; j++)
+         {
+            tempMultiply *= 10;
+         }
+
+         binary.byte[position] += remainder.digit[i] * tempMultiply;
+      }
+
+      if(IsEqual(&numerator, &zero))
+      {
+         break;
+      }
+   }
+   binary.size = position + 1;
+
+   free(numerator.digit);
+   free(denominator.digit);
+   free(remainder.digit);
+   free(zero.digit);
+
+   return binary;
+}
+
+BIG_DECIMAL MULTIPLY_EXPONENT(BIG_DECIMAL *A, BIG_DECIMAL *E)
+{
+   int i, j;
+   unsigned char flag, *ptrForFree;
+   BIG_DECIMAL result, temp;
+
+   BIG_BINARY binaryE = GetBinary(E);
+
+   result = CreateDecimal((unsigned char *)"1", 1); /* 초깃값 1 */
+   temp = MultiplyDigit(A, 1);
+
+   for (i = 0; i < binaryE.size; i++)
+   {
+      flag = 0x01;
+
+      /* byte 당 8 bit */
+      for (j = 0; j < 8; j++)
+      {
+         if(binaryE.byte[i] & flag)
+         {
+            /* bit 값이 1 일경우 */
+            ptrForFree = result.digit;
+            result = MULTIPLY(&result, &temp);
+            free(ptrForFree);
+         }
+
+         ptrForFree = temp.digit;
+         temp = MULTIPLY(&temp, &temp); /* N^b * N^b */
+         free(ptrForFree);
+
+         flag <<= 1;
+         
+      }
+      
+   }
+
+   return result;
+}
