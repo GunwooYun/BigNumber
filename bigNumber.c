@@ -1175,3 +1175,48 @@ BIG_DECIMAL MODULAR_EXPONENT(BIG_DEICMAL *A, BIG_DECIMAL *E, BIG_DECIMAL *M)
 
    return result;
 }
+
+BIG_DECIMAL Factorize(BIG_DECIMAL *A)
+{
+   BIG_DECIMAL denominator, max, result;
+   unsigned char *ptrForFree;
+
+   if((A->digit[0]^0x01) & 0x01)
+   {
+      /* 최하위 비트 XOR 결과 1 이면 짝수 */
+      return CreateDecimal((unsigned char *)"2", 1);
+   }
+
+   denominator = CreateDecimal((unsigned char *)"3", 1);
+
+   max = DEVIDE(A, &denominator); /* A / denominator */
+
+   while(IsBigger(&max, &denominator))
+   {
+      result = MODULAR(A, &denominator); /* A % denominator*/
+
+      if(result.size == 1 && result.digit[0] == 0)
+      {
+         /* 나머지가 0일 경우, denominator가 소수 */
+         free(max.digit);
+         return denominator;
+      }
+
+      free(result.digit);
+
+      ptrForFree = denominator.digit;
+      denominator = PlusDigit(&denominator, 0x02); /* denominator + 1 */
+      free(ptrForeFree);
+
+      ptrForFree = max.digit;
+      max = DIVIDE(A, &denominator); /* A / Denominator */
+      free(ptrForeFree);
+   }
+
+   free(denominator.digit);
+   free(max.digit);
+
+   denominator = MultiplyDigit(A, 1);
+
+   return denominator;
+}
