@@ -1038,3 +1038,65 @@ BIG_DECIMAL MULTIPLY_EXPONENT(BIG_DECIMAL *A, BIG_DECIMAL *E)
 
    return result;
 }
+
+
+BIG_DECIMAL MULTIPLY_EXPONENT_ADV(BIG_DECIMAL *A, BIG_DECIMAL *E)
+{
+   int i, j;
+   unsigned char flag, *ptrForFree;
+   BIG_DECIMAL result, temp;
+
+   BIG_BINARY binaryE = GetBinary(E);
+
+   result = CreateDecimal((unsigned char *)"1", 1); /* 초깃값 1 */
+   temp = MultiplyDigit(A, 1);
+
+   position = 8 * (binaryE.size - 1);
+
+   j = 8;
+   flag = 0x80;
+
+
+   /* 최상위 바이트에서 마지막 1의 위치를 탐색 */
+   for (i = 0; i < 8; i++)
+   {
+      if(binaryE.byte[binaryE.size - 1] & flag)
+      {
+         position += j;
+         break;
+      }
+
+      j--;
+      flag >>= 1;
+   }
+
+   for (i = 0; i < binaryE.size; i++)
+   {
+      flag = 0x01;
+
+      for(j = 0; j < 8; j++)
+      {
+         if(binaryE.byte[i] & flag)
+         {
+            ptrForFree = result.digit;
+            result = MULTIPLY(&result, &temp);
+            free(ptrForeFree);
+         }
+         position--;
+         if(position == 0)
+         {
+            break;
+         }
+
+         ptrForFree = temp.digit;
+         temp = MULTIPLY(&temp, &temp);
+         free(ptrForFree);
+
+         flag <<= 1;
+      }
+   }
+
+   return result;
+
+   return result;
+}
