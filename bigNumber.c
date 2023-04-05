@@ -1220,3 +1220,93 @@ BIG_DECIMAL Factorize(BIG_DECIMAL *A)
 
    return denominator;
 }
+
+
+/* Generate Public Key using p, q */
+BIG_DECIMAL RSAGetPublicKey(BIG_DECIMAL *p, BIG_DECIMAL *q)
+{
+   return MULTIPLY(p, q);
+}
+
+/* Generate Secret Key using p, q, e */
+BIG_DECIMAL RSAGetSecretKey(BIG_DECIMAL *p, BIG_DECIMAL *q, BIG_DECIMAL *e)
+{
+   BIG_DECIMAL secretKey, temp, n, one;
+   unsigned char *ptrForeFree;
+
+   secretKey = CreateDecimal((unsigned char *)"1", 1);
+   one = CreateDecimal((unsigned char *)"1", 1);
+
+   n = MULTIPLY(&Minus(p, 1), &Minus(q, 1));
+
+   while(1)
+   {
+      /* Find S */
+      temp = MULTIPLY(e, &secretKey);
+
+      ptrForeFree(temp.digit);
+      temp = MODULAR(&temp, &n);
+      free(ptrForFree);
+
+      /* (e * S) % n = 1 */
+      if(IsEqual(&temp, &one))
+      {
+         break;
+      }
+      ptrForFree = secretKey.digit;
+      secretKey = PlusDigit(&secretKey, 0x01); /* S = S + 1 */
+      free(ptrForFree);
+      free(temp.digit);
+   }
+
+   return secretKey;
+}
+
+
+/* Generate Secret Key using p, q, e */
+BIG_DECIMAL RSAGetSecretKeyADV(BIG_DECIMAL *p, BIG_DECIMAL *q, BIG_DECIMAL *e)
+{
+   BIG_DECIMAL secretKey, temp, n, one;
+   unsigned char *ptrForeFree;
+
+   one = CreateDecimal((unsigned char *)"1", 1);
+
+   n = MULTIPLY(&Minus(p, 1), &Minus(q, 1));
+
+   /* S = n / e */ 
+   secretKey = DIVIDE(&n, e);
+   temp = MULTIPLY(e, &secretKey);
+
+   while(1)
+   {
+      /* Find S */
+      ptrForeFree(temp.digit);
+      temp = MODULAR(&temp, &n);
+      free(ptrForFree);
+
+      /* (e * S) % n = 1 */
+      if(IsEqual(&temp, &one))
+      {
+         break;
+      }
+      ptrForFree = secretKey.digit;
+      secretKey = PlusDigit(&secretKey, 0x01); /* S = S + 1 */
+      free(ptrForFree);
+
+      ptrForFree = temp.digit;
+      temp = PLUS(&temp, e);
+      free(temp.digit);
+   }
+
+   return secretKey;
+}
+
+BIG_DECIMAL RSAEncrypt(BIG_DECIMAL *plain, BIG_DECIMAL *e, BIG_DECIMAL *publicKey)
+{
+   return MODULAR_EXPONENT(plain, e, publicKey);
+}
+
+BIG_DECIMAL RSADecrypt(BIG_DECIMAL *cipher, BIG_DECIMAL *secretKey, BIG_DECIMAL *publicKey)
+{
+   return MODULAR_EXPONENT(cipher, secretKey, publicKey);
+}
