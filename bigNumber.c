@@ -1100,3 +1100,78 @@ BIG_DECIMAL MULTIPLY_EXPONENT_ADV(BIG_DECIMAL *A, BIG_DECIMAL *E)
 
    return result;
 }
+
+/* 2^22 % 7 = 2^10110 % 7
+ * ((2^10000 % 7) * (2^100 % 7) * (2^10 % 7)) % 7
+ * (2 * 2 * 4) % 7
+ * (2 * ((2 * 4) % 7)) % 7
+ * (2 * 1) % 7
+ * 2
+ * */
+BIG_DECIMAL MODULAR_EXPONENT(BIG_DEICMAL *A, BIG_DECIMAL *E, BIG_DECIMAL *M)
+{
+   int position;
+   unsigned char flag, *ptrForFree;
+   BIG_DECIMAL result, temp;
+
+   BIG_BINARY binaryE = GetBinary(E);
+
+   result = CreateDecimal((unsigned char *)"1", 1);
+   temp = MultiplyDigit(A, 1);
+
+   position = 8 * (binaryE.size - 1);
+
+   j = 8;
+   flag = 0x80;
+
+
+   /* 최상위 바이트에서 마지막 1의 위치를 탐색 */
+   for (i = 0; i < 8; i++)
+   {
+      if(binaryE.byte[binaryE.size - 1] & flag)
+      {
+         position += j;
+         break;
+      }
+
+      j--;
+      flag >>= 1;
+   }
+
+   for (i = 0; i < binaryE.size; i++)
+   {
+      flag = 0x01;
+
+      for(j = 0; j < 8; j++)
+      {
+         if(binaryE.byte[i] & flag)
+         {
+            ptrForFree = result.digit;
+            result = MULTIPLY(&result, &temp);
+            free(ptrForeFree);
+
+            /* Modulo 연산 */
+            ptrForFree = result.digit;
+            result = MODULAR(&result, M);
+            free(ptrForeFree);
+         }
+         position--;
+         if(position == 0)
+         {
+            break;
+         }
+
+         ptrForFree = temp.digit;
+         temp = MULTIPLY(&temp, &temp);
+         free(ptrForFree);
+
+         ptrForFree = temp.digit;
+         temp = MODULAR(&temp, M);
+         free(ptrForeFree);
+
+         flag <<= 1;
+      }
+   }
+
+   return result;
+}
